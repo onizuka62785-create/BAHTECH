@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mes Documents</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f7f6f3; --surface: #ffffff; --surface2: #f0ede8;
+      --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.18);
+      --text: #1a1a18; --text2: #6b6860; --text3: #a09d98;
+      --accent: #1a1a18; --accent-text: #ffffff;
+      --blue-bg: #e8f0fb; --blue-text: #1a4fa0;
+      --green-bg: #e3f5ec; --green-text: #0f6040;
+      --red: #d94040; --red-bg: #fdf0f0;
+      --yellow-bg: #fffbe6; --yellow-text: #7a5c00;
+      --radius: 10px; --radius-lg: 14px;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* LOGIN */
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .login-box { width: 100%; max-width: 420px; }
+    .brand { text-align: center; margin-bottom: 2.5rem; }
+    .brand-icon { width: 60px; height: 60px; background: var(--text); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .brand h1 { font-size: 22px; font-weight: 600; }
+    .brand p { font-size: 14px; color: var(--text2); margin-top: 4px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .tabs { display: flex; background: var(--surface2); border-radius: var(--radius); padding: 3px; margin-bottom: 1.5rem; gap: 2px; }
+    .tab { flex: 1; padding: 8px; text-align: center; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: calc(var(--radius) - 2px); color: var(--text2); transition: all 0.15s; }
+    .tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    label { font-size: 13px; color: var(--text2); display: block; margin-bottom: 6px; }
+    input[type="text"], input[type="password"], input[type="url"] { width: 100%; padding: 10px 14px; border: 1px solid var(--border2); border-radius: var(--radius); font-family: inherit; font-size: 14px; background: var(--surface); color: var(--text); outline: none; transition: border 0.15s; }
+    input:focus { border-color: var(--text); }
+    .btn-primary { width: 100%; margin-top: 1rem; padding: 11px; background: var(--accent); color: var(--accent-text); border: none; border-radius: var(--radius); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-outline { padding: 8px 14px; background: transparent; color: var(--text); border: 1px solid var(--border2); border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .btn-outline:hover { background: var(--surface2); }
+    .btn-danger { padding: 6px 12px; background: transparent; color: var(--red); border: 1px solid var(--red); border-radius: var(--radius); font-family: inherit; font-size: 12px; cursor: pointer; transition: background 0.15s; }
+    .btn-danger:hover { background: var(--red-bg); }
+    .btn-green { padding: 9px 16px; background: var(--green-text); color: #fff; border: none; border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-green:hover { opacity: 0.85; }
+    .error { font-size: 13px; color: var(--red); margin-top: 8px; display: none; padding: 8px 12px; background: var(--red-bg); border-radius: var(--radius); }
+    .hint { font-size: 12px; color: var(--text3); margin-top: 8px; }
+
+    /* NAV */
+    .navbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 1.5rem; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    .nav-brand { font-size: 16px; font-weight: 600; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; }
+    .badge-admin { background: #ece9ff; color: #3d2fa0; }
+    .badge-guest { background: var(--green-bg); color: var(--green-text); }
+
+    .main { max-width: 680px; margin: 0 auto; padding: 2rem 1rem; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .section-title { font-size: 16px; font-weight: 600; }
+
+    /* CODE BOX */
+    .code-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+    .code-label { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .code-display { display: flex; align-items: center; justify-content: space-between; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
+    .code-value { font-family: 'DM Mono', monospace; font-size: 18px; letter-spacing: 3px; color: var(--text); }
+    .code-actions { display: flex; align-items: center; gap: 8px; }
+    .copied-msg { font-size: 12px; color: var(--green-text); display: none; }
+    .change-code-form { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .inline-row { display: flex; gap: 8px; margin-top: 6px; }
+    .inline-row input { flex: 1; }
+
+    /* ADD PDF FORM */
+    .add-pdf-form { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+    .add-pdf-form .form-title { font-size: 14px; font-weight: 600; margin-bottom: 1rem; }
+    .form-row { margin-bottom: 12px; }
+    .form-actions { display: flex; gap: 8px; margin-top: 1rem; flex-wrap: wrap; }
+
+    /* INFO BOX */
+    .info-box { background: var(--yellow-bg); border: 1px solid #e8d58a; border-radius: var(--radius); padding: 12px 14px; margin-bottom: 1.5rem; font-size: 13px; color: var(--yellow-text); line-height: 1.7; }
+    .info-box strong { font-weight: 600; }
+    .info-box ol { margin-left: 1.2rem; margin-top: 6px; }
+    .info-box li { margin-bottom: 4px; }
+
+    /* FILE LIST */
+    .file-list { display: flex; flex-direction: column; gap: 8px; }
+    .file-item { display: flex; align-items: center; gap: 12px; padding: 14px 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); transition: border-color 0.15s; }
+    .file-item:hover { border-color: var(--border2); }
+    .file-icon { width: 40px; height: 40px; background: var(--blue-bg); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .file-info { flex: 1; min-width: 0; }
+    .file-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-meta { font-size: 12px; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .empty-state { text-align: center; padding: 3rem 1rem; background: var(--surface); border: 1px dashed var(--border2); border-radius: var(--radius-lg); color: var(--text2); font-size: 14px; }
+    .empty-state p { margin-top: 8px; font-size: 13px; color: var(--text3); }
+
+    /* PDF VIEWER */
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text2); cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; margin-bottom: 1rem; transition: color 0.15s; }
+    .back-btn:hover { color: var(--text); }
+    .pdf-frame-wrap { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .pdf-frame-wrap iframe { display: block; width: 100%; height: 600px; border: none; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.75rem 0; }
+
+    @media (max-width: 480px) {
+      .file-item { flex-wrap: wrap; }
+      .file-actions { width: 100%; justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="screen-access" class="screen active">
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <h1>Mes Documents</h1>
+        <p>Espace privé de partage de fichiers PDF</p>
+      </div>
+      <div class="card">
+        <div class="tabs">
+          <div class="tab active" id="tab-btn-guest" onclick="switchTab('guest')">Accès invité</div>
+          <div class="tab" id="tab-btn-admin" onclick="switchTab('admin')">Administrateur</div>
+        </div>
+        <div id="tab-guest">
+          <label>Code d'accès</label>
+          <input type="password" id="guest-code" placeholder="Entrez le code reçu…" maxlength="16" />
+          <div class="error" id="err-guest">Code incorrect. Veuillez réessayer.</div>
+          <button class="btn-primary" onclick="loginGuest()">Accéder aux documents</button>
+          <p class="hint">Le code vous a été fourni par le propriétaire du site.</p>
+        </div>
+        <div id="tab-admin" style="display:none;">
+          <label>Mot de passe administrateur</label>
+          <input type="password" id="admin-code" placeholder="Mot de passe admin…" maxlength="32" />
+          <div class="error" id="err-admin">Mot de passe incorrect.</div>
+          <button class="btn-primary" onclick="loginAdmin()">Gérer les documents</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN ═══ -->
+<div id="screen-admin" class="screen">
+  <nav class="navbar">
+    <span class="nav-brand">Mes Documents</span>
+    <div class="nav-right">
+      <span class="badge badge-admin">Administrateur</span>
+      <button class="btn-outline" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+  <div class="main">
+    <div class="code-section">
+      <div class="code-label">Code d'accès invité</div>
+      <div class="code-display">
+        <span class="code-value" id="display-guest-code">DOC2025</span>
+        <div class="code-actions">
+          <span class="copied-msg" id="copied-msg">Copié !</span>
+          <button class="btn-outline" onclick="copyCode()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copier
+          </button>
+          <button class="btn-outline" onclick="toggleChangeCode()">Modifier</button>
+        </div>
+      </div>
+      <div class="change-code-form" id="change-code-form">
+        <label>Nouveau code (min. 4 caractères)</label>
+        <div class="inline-row">
+          <input type="text" id="new-code-input" placeholder="Ex: ABIDJAN2025" maxlength="16" />
+          <button class="btn-outline" onclick="saveCode()">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>📋 Comment obtenir le lien Google Drive d'un PDF ?</strong>
+      <ol>
+        <li>Allez sur <strong>drive.google.com</strong> et uploadez votre PDF</li>
+        <li>Clic droit sur le fichier → <strong>"Partager"</strong></li>
+        <li>Cliquez <strong>"Modifier"</strong> → choisissez <strong>"Tout le monde avec le lien"</strong></li>
+        <li>Cliquez <strong>"Copier le lien"</strong> et collez-le ci-dessous</li>
+      </ol>
+    </div>
+
+    <div class="add-pdf-form">
+      <div class="form-title">➕ Ajouter un document PDF</div>
+      <div class="form-row">
+        <label>Nom du document</label>
+        <input type="text" id="new-file-name" placeholder="Ex : Contrat de vente, Rapport 2024…" maxlength="80" />
+      </div>
+      <div class="form-row">
+        <label>Lien Google Drive du PDF</label>
+        <input type="url" id="new-file-url" placeholder="https://drive.google.com/file/d/…" />
+      </div>
+      <div class="error" id="err-add">Veuillez remplir le nom et coller un lien valide.</div>
+      <div class="form-actions">
+        <button class="btn-green" onclick="addPdf()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Publier le document
+        </button>
+        <button class="btn-outline" onclick="clearForm()">Effacer</button>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Documents publiés (<span id="admin-count">0</span>)</div>
+    </div>
+    <div id="admin-file-list"></div>
+  </div>
+</div>
+
+<!-- ═══ GUEST ═══ -->
+<div id="screen-guest" class="screen">
+  <nav class="navbar">
+    <span class="nav-brand">Mes Documents</span>
+    <div class="nav-right">
+      <span class="badge badge-guest">Invité</span>
+      <button class="btn-outline" onclick="logout()">Quitter</button>
+    </div>
+  </nav>
+  <div class="main">
+    <div id="guest-main">
+      <div class="section-title" style="margin-bottom:1rem;">Documents disponibles</div>
+      <div id="guest-file-list"></div>
+    </div>
+    <div id="pdf-viewer-screen" style="display:none;">
+      <button class="back-btn" onclick="closePdf()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Retour aux documents
+      </button>
+      <div class="section-title" id="viewer-title" style="margin-bottom:1rem;"></div>
+      <div class="pdf-frame-wrap">
+        <iframe id="pdf-frame" src="" allowfullscreen></iframe>
+      </div>
+      <p class="hint" style="margin-top:10px;text-align:center;">Si le PDF ne s'affiche pas correctement, ouvrez-le dans un nouvel onglet.</p>
+      <div style="text-align:center;margin-top:10px;">
+        <a id="open-tab-link" href="#" target="_blank" class="btn-outline" style="display:inline-flex;text-decoration:none;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Ouvrir dans un nouvel onglet
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ══ CHANGEZ CES VALEURS AVANT DE DÉPLOYER ══
+  const ADMIN_PASSWORD = 'admin123';
+  let GUEST_CODE = 'DOC2025';
+  // ════════════════════════════════════════════
+
+  let files = [];
+  let nextId = 1;
+
+  function save() {
+    try {
+      localStorage.setItem('mesdocs_files', JSON.stringify(files));
+      localStorage.setItem('mesdocs_id', String(nextId));
+      localStorage.setItem('mesdocs_code', GUEST_CODE);
+    } catch(e) {}
+  }
+
+  function load() {
+    try {
+      const f = localStorage.getItem('mesdocs_files');
+      if (f) files = JSON.parse(f);
+      const n = localStorage.getItem('mesdocs_id');
+      if (n) nextId = parseInt(n);
+      const g = localStorage.getItem('mesdocs_code');
+      if (g) GUEST_CODE = g;
+    } catch(e) {}
+  }
+
+  load();
+
+  function switchTab(tab) {
+    document.getElementById('tab-btn-guest').classList.toggle('active', tab === 'guest');
+    document.getElementById('tab-btn-admin').classList.toggle('active', tab === 'admin');
+    document.getElementById('tab-guest').style.display = tab === 'guest' ? 'block' : 'none';
+    document.getElementById('tab-admin').style.display = tab === 'admin' ? 'block' : 'none';
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function loginGuest() {
+    const val = document.getElementById('guest-code').value.trim();
+    if (val === GUEST_CODE) {
+      document.getElementById('err-guest').style.display = 'none';
+      renderGuest(); showScreen('screen-guest');
+    } else {
+      document.getElementById('err-guest').style.display = 'block';
+    }
+  }
+
+  function loginAdmin() {
+    const val = document.getElementById('admin-code').value.trim();
+    if (val === ADMIN_PASSWORD) {
+      document.getElementById('err-admin').style.display = 'none';
+      renderAdmin(); showScreen('screen-admin');
+    } else {
+      document.getElementById('err-admin').style.display = 'block';
+    }
+  }
+
+  function logout() {
+    document.getElementById('guest-code').value = '';
+    document.getElementById('admin-code').value = '';
+    closePdf();
+    showScreen('screen-access');
+  }
+
+  function toEmbed(url) {
+    const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) return 'https://drive.google.com/file/d/' + m[1] + '/preview';
+    return url;
+  }
+
+  function addPdf() {
+    const name = document.getElementById('new-file-name').value.trim();
+    const url  = document.getElementById('new-file-url').value.trim();
+    const err  = document.getElementById('err-add');
+    if (!name || !url) { err.style.display = 'block'; return; }
+    err.style.display = 'none';
+    files.push({ id: nextId++, name, embedUrl: toEmbed(url), rawUrl: url });
+    save();
+    clearForm();
+    renderAdmin();
+  }
+
+  function clearForm() {
+    document.getElementById('new-file-name').value = '';
+    document.getElementById('new-file-url').value = '';
+    document.getElementById('err-add').style.display = 'none';
+  }
+
+  function removeFile(id) {
+    files = files.filter(f => f.id !== id);
+    save();
+    renderAdmin();
+  }
+
+  function renderAdmin() {
+    document.getElementById('display-guest-code').textContent = GUEST_CODE;
+    document.getElementById('admin-count').textContent = files.length;
+    const list = document.getElementById('admin-file-list');
+    if (!files.length) {
+      list.innerHTML = `<div class="empty-state">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:#a09d98;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div style="margin-top:10px;font-weight:500;">Aucun document publié</div>
+        <p>Remplissez le formulaire ci-dessus pour ajouter votre premier PDF.</p>
+      </div>`;
+      return;
+    }
+    list.innerHTML = '<div class="file-list">' + files.map(f => `
+      <div class="file-item">
+        <div class="file-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a4fa0" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="file-info">
+          <div class="file-name">${esc(f.name)}</div>
+          <div class="file-meta">${esc(f.rawUrl)}</div>
+        </div>
+        <div class="file-actions">
+          <button class="btn-danger" onclick="removeFile(${f.id})">Supprimer</button>
+        </div>
+      </div>`).join('') + '</div>';
+  }
+
+  function toggleChangeCode() {
+    const f = document.getElementById('change-code-form');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  }
+  function saveCode() {
+    const val = document.getElementById('new-code-input').value.trim();
+    if (val.length < 4) { alert('Le code doit contenir au moins 4 caractères.'); return; }
+    GUEST_CODE = val; save();
+    document.getElementById('display-guest-code').textContent = GUEST_CODE;
+    document.getElementById('change-code-form').style.display = 'none';
+    document.getElementById('new-code-input').value = '';
+  }
+  function copyCode() {
+    navigator.clipboard.writeText(GUEST_CODE).catch(() => prompt('Copiez ce code :', GUEST_CODE));
+    const msg = document.getElementById('copied-msg');
+    msg.style.display = 'inline';
+    setTimeout(() => msg.style.display = 'none', 2200);
+  }
+
+  function renderGuest() {
+    document.getElementById('guest-main').style.display = 'block';
+    document.getElementById('pdf-viewer-screen').style.display = 'none';
+    const list = document.getElementById('guest-file-list');
+    if (!files.length) {
+      list.innerHTML = `<div class="empty-state">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:#a09d98;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div style="margin-top:10px;font-weight:500;">Aucun document disponible</div>
+        <p>Le propriétaire n'a pas encore publié de fichiers.</p>
+      </div>`;
+      return;
+    }
+    list.innerHTML = '<div class="file-list">' + files.map(f => `
+      <div class="file-item">
+        <div class="file-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a4fa0" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="file-info">
+          <div class="file-name">${esc(f.name)}</div>
+          <div class="file-meta">Document PDF</div>
+        </div>
+        <div class="file-actions">
+          <button class="btn-outline" onclick="openPdf(${f.id})">Ouvrir</button>
+        </div>
+      </div>`).join('') + '</div>';
+  }
+
+  function openPdf(id) {
+    const f = files.find(x => x.id === id);
+    if (!f) return;
+    document.getElementById('viewer-title').textContent = f.name;
+    document.getElementById('pdf-frame').src = f.embedUrl;
+    document.getElementById('open-tab-link').href = f.rawUrl;
+    document.getElementById('guest-main').style.display = 'none';
+    document.getElementById('pdf-viewer-screen').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function closePdf() {
+    document.getElementById('pdf-frame').src = '';
+    document.getElementById('pdf-viewer-screen').style.display = 'none';
+    document.getElementById('guest-main').style.display = 'block';
+  }
+
+  function esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  document.getElementById('guest-code').addEventListener('keydown', e => { if (e.key==='Enter') loginGuest(); });
+  document.getElementById('admin-code').addEventListener('keydown', e => { if (e.key==='Enter') loginAdmin(); });
+</script>
+</body>
+</html>
